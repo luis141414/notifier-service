@@ -31,24 +31,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 🛡️ 1. Leer el header "Authorization"
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // ⛔ Si no hay token o no empieza con "Bearer ", seguimos sin autenticar
+        // If there is no token or it does not start with "Bearer", we are still not authenticated.
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ 2. Extraer el token y username
-        final String token = authHeader.substring(7); // Salta "Bearer "
+        final String token = authHeader.substring(7);
         final String username = jwtTokenProvider.extractUsername(token);
 
-        // ⚠️ 3. Verificar si ya hay una autenticación activa
+        // Check if there is already an active authentication
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
 
-            // 🔐 4. Validar el token contra el usuario cargado
+            // Validate the token against the loaded user
             if (jwtTokenProvider.isTokenValid(token, userDetails)) {
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -56,17 +54,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities()
                 );
 
-                // 📌 Enlazar detalles del request (IP, sesión, etc.)
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                // Link details of the request (IP, session, etc.)
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // ✅ 5. Registrar autenticación en el contexto de seguridad
+                // Register authentication in the security context
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // 🔁 Continuar con el siguiente filtro
+        // Continue with the next filter
         filterChain.doFilter(request, response);
     }
 }

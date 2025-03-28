@@ -30,24 +30,24 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // ✅ Nuevo nombre usado por el filtro
+    // Extracts the username (subject) from the JWT token
     public String extractUsername(String token) {
         return getAllClaims(token).getSubject();
     }
 
-    // ✅ Nuevo método para validar con userDetails
+    // Checks if the provided token is valid by comparing the username and verifying the token's expiration
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    // 🔒 Interno: comprueba expiración
+    // check expiration
     private boolean isTokenExpired(String token) {
         final Date expiration = getAllClaims(token).getExpiration();
         return expiration.before(new Date());
     }
 
-    // 🔐 Interno: devuelve todos los claims del token
+    // Returns all the claims from the token
     private Claims getAllClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(jwtSecret)

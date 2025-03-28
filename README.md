@@ -1,10 +1,12 @@
 # 📬 Notifier Service
 
-**Notifier Service** es un microservicio de notificaciones en tiempo real basado en reglas definidas por el usuario. Permite recibir alertas vía correo electrónico (próximamente también Telegram) cuando se cumplen condiciones sobre eventos como el precio del Bitcoin u otros eventos personalizados.
+**Notifier Service** is a real-time notification microservice based on user-defined rules. It allows receiving alerts via email when certain conditions are met for events like Bitcoin price or other customized events.
+
+Currently, the Bitcoin price rule is implemented, and more rules will be added as development progresses. The project is actively under development.
 
 ---
 
-## ⚙️ Tecnologías utilizadas
+## ⚙️ Technologies Used
 
 - Java 17
 - Spring Boot 3
@@ -16,4 +18,4 @@
 
 ---
 
-## 📂 Estructura basada en Arquitectura Hexagonal
+## 📂 Structure Based on Hexagonal Architecture

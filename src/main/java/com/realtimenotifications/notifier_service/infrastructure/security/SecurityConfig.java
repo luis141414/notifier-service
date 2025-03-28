@@ -15,7 +15,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Inyectamos el filtro JWT personalizado que validará los tokens en cada request
+    // We inject the custom JWT filter that will validate the tokens in each request
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
@@ -23,12 +23,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Desactivamos CSRF para simplificar peticiones tipo API
+            .csrf(csrf -> csrf.disable()) // We disabled CSRF to simplify API requests
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Permitimos acceso sin login a login/registro
-                .anyRequest().authenticated() // Todo lo demás requiere un JWT válido
+                .requestMatchers("/api/auth/**").permitAll() // We allow access without login to login/registration
+                .anyRequest().authenticated() // Everything else requires a valid JWT
             )
-            // Registramos nuestro filtro JWT antes del filtro de autenticación por usuario/contraseña
+            // We register our JWT filter before the username/password authentication filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -36,13 +36,13 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Usamos BCrypt como algoritmo de hashing seguro para contraseñas
+        // We use BCrypt as a secure hashing algorithm for passwords
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        // Necesario para autenticar manualmente en el login (AuthService)
+        // Required to manually authenticate at login (AuthService)
         return config.getAuthenticationManager();
     }
 }

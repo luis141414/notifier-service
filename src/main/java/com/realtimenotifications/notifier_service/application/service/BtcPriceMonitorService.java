@@ -32,7 +32,7 @@ public class BtcPriceMonitorService {
         try {
             NotificationRule rule = objectMapper.readValue(message, NotificationRule.class);
             if ("BTC_PRICE".equalsIgnoreCase(rule.getEvent()) && !activeTasks.containsKey(rule.getId())) {
-                log.info("🎯 Añadiendo regla BTC activa con monitorización: {}", rule);
+                log.info("Adding active BTC rule with monitoring: {}", rule);
                 ScheduledFuture<?> task = scheduler.scheduleAtFixedRate(
                         () -> checkRule(rule),
                         0,
@@ -42,7 +42,7 @@ public class BtcPriceMonitorService {
                 activeTasks.put(rule.getId(), task);
             }
         } catch (Exception e) {
-            log.error("❌ Error al procesar la regla desde Kafka: {}", e.getMessage());
+            log.error("Error processing rule from Kafka: {}", e.getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ public class BtcPriceMonitorService {
         Double btcPrice = fetchBtcPrice();
         if (btcPrice == null) return;
 
-        log.info("📈 [Regla {}] Precio actual de BTC: {}", rule.getId(), btcPrice);
+        log.info("[Rule {}] Current BTC price: {}", rule.getId(), btcPrice);
 
         boolean conditionMet = switch (rule.getOperator()) {
             case ">" -> btcPrice > rule.getThreshold();
@@ -60,15 +60,14 @@ public class BtcPriceMonitorService {
         };
 
         if (conditionMet) {
-            log.info("✅ Regla cumplida para {}: {}", rule.getUserName(), rule);
+            log.info("Rule fulfilled for {}: {}", rule.getUserName(), rule);
             if ("EMAIL".equalsIgnoreCase(rule.getChannel())) {
                 notificationSender.send(
                         rule.getRecipient(),
-                        "Regla cumplida",
-                        "El precio del BTC es: " + btcPrice
+                        "Rule fulfilled",
+                        "The price of BTC is: " + btcPrice
                 );
             }
-            // Cancelar la tarea si solo queremos notificar una vez
             cancelRule(rule.getId());
         }
     }
@@ -79,7 +78,7 @@ public class BtcPriceMonitorService {
             var response = restTemplate.getForObject(url, String.class);
             return objectMapper.readTree(response).path("bitcoin").path("usd").asDouble();
         } catch (Exception e) {
-            log.error("❌ Error al obtener el precio del BTC: {}", e.getMessage());
+            log.error("Error getting BTC price: {}", e.getMessage());
             return null;
         }
     }
@@ -88,7 +87,7 @@ public class BtcPriceMonitorService {
         ScheduledFuture<?> task = activeTasks.remove(ruleId);
         if (task != null) {
             task.cancel(true);
-            log.info("🛑 Monitorización detenida para regla: {}", ruleId);
+            log.info("Monitoring stopped for rule: {}", ruleId);
         }
     }
 }

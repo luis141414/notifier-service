@@ -45,7 +45,7 @@ public class NotificationRuleService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        // Envía la regla al topic Kafka
+        // Send the rule to the Kafka topic
         kafkaProducer.sendNotificationEvent(json);
 
         return savedRule;
